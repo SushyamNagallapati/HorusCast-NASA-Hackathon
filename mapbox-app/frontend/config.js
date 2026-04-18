@@ -1,8 +1,6 @@
 (function () {
   const override = new URLSearchParams(location.search).get('backend');
-  const PROD_BACKEND = 'https://YOUR-BACKEND.example.com';
-  const LOCAL_BACKEND = 'http://localhost:4000';
-  window.BACKEND_URL =
-    override || (location.hostname.endsWith('github.io') ? PROD_BACKEND : LOCAL_BACKEND);
+  const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+  window.BACKEND_URL = override || (isLocal ? 'http://localhost:4000' : '/api');
   console.log('[config] BACKEND_URL =', window.BACKEND_URL);
 })();

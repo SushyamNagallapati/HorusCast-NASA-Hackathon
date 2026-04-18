@@ -18,20 +18,11 @@ const __dirname  = path.dirname(__filename);
 
 const app = express();
 
-// Allow your local front-end ports. Add prod origins when you deploy.
-const allowedOrigins = [
-  'http://localhost:5500',
-  'http://127.0.0.1:5500',
-  'http://localhost:8088',
-  'http://127.0.0.1:8088',
-  // 'https://<your-user>.github.io',
-  // 'https://<your-user>.github.io/<your-repo>',
-];
-app.use(cors({ origin: allowedOrigins }));
+app.use(cors({ origin: true }));
 app.use(express.json());
 
-// Data folder/files
-const dataDir       = path.join(__dirname, 'data');
+// Data folder/files — use /tmp on Vercel (serverless), local data/ otherwise
+const dataDir       = process.env.VERCEL ? '/tmp' : path.join(__dirname, 'data');
 const journeysFile  = path.join(dataDir, 'journeys.json');
 const searchesFile  = path.join(dataDir, 'searches.json');
 
@@ -502,8 +493,11 @@ app.get('/nasa', async (req, res) => {
   }
 });
 
-// ---------- Start server ----------
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`Backend on http://localhost:${PORT}`);
-});
+// ---------- Start server (local only) ----------
+const isMain = process.argv[1] === fileURLToPath(import.meta.url);
+if (isMain) {
+  const PORT = process.env.PORT || 4000;
+  app.listen(PORT, () => console.log(`Backend on http://localhost:${PORT}`));
+}
+
+export default app;
